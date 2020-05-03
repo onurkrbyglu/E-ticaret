@@ -8,6 +8,7 @@ using System.Web.Mvc;
 
 namespace ECommerce.Web.Areas.Admin.Controllers
 {
+    [UserAuthorize]
     public class ProductController : Controller
     {
         // GET: Admin/Product
@@ -28,10 +29,8 @@ namespace ECommerce.Web.Areas.Admin.Controllers
                 productModel.Barcode = product.Barcode;
                 productModel.CategoryName = product.Category.Name;
                 productModel.ManufactureName = product.Manufacturer.Name;
-
                 model.Products.Add(productModel);
             }
-
             return View(model);
         }
 
@@ -40,23 +39,16 @@ namespace ECommerce.Web.Areas.Admin.Controllers
             var model = new ProductModel();
             var categories = db.Categories.Where(x => x.Deleted == false).ToList();
             var manufacturers = db.Manufacturers.Where(x => x.Deleted == false).ToList();
-
             model.AvailableCategories = categories.Select(x => new SelectListItem
             {
                 Text = x.Name,
                 Value = x.Id.ToString()
             }).ToList();
-
-
             model.AvailableManufacturers = manufacturers.Select(x => new SelectListItem
             {
                 Text = x.Name,
                 Value = x.Id.ToString()
             }).ToList();
-
-
-
-
             return View(model);
         }
 
@@ -74,7 +66,6 @@ namespace ECommerce.Web.Areas.Admin.Controllers
             p.ManufacturerId = model.ManufactureId;
             p.CreatedOnUtc = DateTime.Now;
             p.Description = model.Description;
-
             db.Products.Add(p);
             db.SaveChanges();
             return RedirectToAction("List");
@@ -93,16 +84,11 @@ namespace ECommerce.Web.Areas.Admin.Controllers
                 Text = x.Name,
                 Value = x.Id.ToString()
             }).ToList();
-
-
             model.AvailableManufacturers = manufacturers.Select(x => new SelectListItem
             {
                 Text = x.Name,
                 Value = x.Id.ToString()
-            }).ToList();
-
-            
-
+            }).ToList();           
             model.Id = product.Id;
             model.ManufactureId = product.ManufacturerId;
             model.Name = product.Name;
@@ -112,7 +98,6 @@ namespace ECommerce.Web.Areas.Admin.Controllers
             model.Barcode = product.Barcode;
             model.CategoryId = product.CategoryId;
             model.Description = product.Description;
-
             return View(model);
         }
 
@@ -129,13 +114,9 @@ namespace ECommerce.Web.Areas.Admin.Controllers
             product.Barcode = model.Barcode;
             product.CategoryId = model.CategoryId;
             product.Description = model.Description;
-
             db.SaveChanges();
-
-
             return RedirectToAction("List");
         }
-
         public ActionResult Delete(int id)
         {
             Product product = db.Products.SingleOrDefault(x => x.Id == id);
@@ -143,8 +124,5 @@ namespace ECommerce.Web.Areas.Admin.Controllers
             db.SaveChanges();
             return RedirectToAction("List");
         }
-
-
-
     }
 }

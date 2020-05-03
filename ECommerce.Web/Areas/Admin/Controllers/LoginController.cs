@@ -30,13 +30,13 @@ namespace ECommerce.Web.Areas.Admin.Controllers
 
             if (User != null)
             {
+                Session.Add("Oturum", User.Id);
                 Session.Add("FirstName", User.FirstName);
                 Session.Add("LastName", User.LastName);
                 return RedirectToAction("Index", "Home");
             }
 
-            ViewBag.Error = "Bilgiler Hatalı";
-            //test
+            ViewBag.Error = "Bilgiler Hatalı";       
             return View();
         }
 

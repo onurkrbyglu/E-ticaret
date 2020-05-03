@@ -7,6 +7,7 @@ using System.Web.Mvc;
 
 namespace ECommerce.Web.Areas.Admin.Controllers
 {
+    [UserAuthorize]
     public class ManufacturerController : Controller
     {
         // GET: Admin/Manufacturer

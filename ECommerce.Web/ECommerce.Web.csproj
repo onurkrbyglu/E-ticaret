@@ -1677,6 +1677,7 @@
     <Compile Include="Areas\Admin\Models\ManufacturerModel.cs" />
     <Compile Include="Areas\Admin\Models\ProductListModel.cs" />
     <Compile Include="Areas\Admin\Models\ProductModel.cs" />
+    <Compile Include="Areas\Admin\Models\UserAuthorize.cs" />
     <Compile Include="Category.cs">
       <DependentUpon>GurhanDbModel.tt</DependentUpon>
     </Compile>
