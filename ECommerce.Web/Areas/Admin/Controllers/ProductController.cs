@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Security.Cryptography;
 using System.Web;
 using System.Web.Mvc;
@@ -15,145 +14,136 @@ namespace ECommerce.Web.Areas.Admin.Controllers
         private GurhanDbEntities db = new GurhanDbEntities();
         public ActionResult List()
         {
-            ProductListModel productmodel = new ProductListModel();
+            var products = db.Products.Where(x => x.Deleted == false).ToList();
+            ProductListModel model = new ProductListModel();
+            foreach (var product in products)
+            {
+                var productModel = new ProductModel();
+                productModel.Id = product.Id;
+                productModel.Name = product.Name;
+                productModel.Price = product.Price;
+                productModel.Sku = product.Sku;
+                productModel.Description = product.Description;
+                productModel.Active = product.Active;
+                productModel.Barcode = product.Barcode;
+                productModel.CategoryName = product.Category.Name;
+                productModel.ManufactureName = product.Manufacturer.Name;
 
-            var products = db.Products.Where(x => x.Deleted == false);
-            var categorys = db.Categories.Where(x => x.Deleted == false);
-            var manufacturers = db.Manufacturers.Where(x => x.Deleted == false);
-            foreach (var item in products)
-            {
-                ProductModel product = new ProductModel();
-                product.Id = item.Id;
-                product.Name = item.Name;
-                product.Description = item.Description;
-                product.Barcode = item.Barcode;
-                product.Sku = item.Sku;
-                product.Price = item.Price;
-                product.ManufacturerId = item.ManufacturerId;
-                product.CategoryId = item.CategoryId;
-                product.Active = item.Active;              
-                productmodel.Products.Add(product);
+                model.Products.Add(productModel);
             }
-            foreach (var item in categorys)
-            {
-                CategoryModel category = new CategoryModel();
-                category.Id = item.Id;
-                category.Name = item.Name;
-                productmodel.Categorys.Add(category);
-                
-            }
-            foreach (var item in manufacturers)
-            {
-                ManufacturerModel manufacturer = new ManufacturerModel();
-                manufacturer.Id = item.Id;
-                manufacturer.Name = item.Name;
-                productmodel.Manufacturers.Add(manufacturer);
-            }
-            return View(productmodel);
 
+            return View(model);
         }
 
-        public ActionResult Edit(int id)
-        {          
-            var entity = db.Products.Find(id);
-            var categorys = db.Categories.Where(x => x.Deleted == false).Where(x=>x.Published==true);
-            var manufacturers = db.Manufacturers.Where(x => x.Deleted == false).Where(x => x.Published == true);
-            ProductModel model = new ProductModel();
-            model.Id = entity.Id;            
-            model.Name = entity.Name;
-            model.Description = entity.Description;
-            model.Barcode = entity.Barcode;
-            model.Sku = entity.Sku;
-            model.Price = entity.Price;
-            model.ManufacturerId = entity.ManufacturerId;
-            model.CategoryId = entity.CategoryId;
-            model.Active = entity.Active;
-            foreach (var item in categorys)
-            {
-                CategoryModel category = new CategoryModel();
-                category.Id = item.Id;
-                category.Name = item.Name;
-                model.Categorys.Add(category);
+        public ActionResult Add()
+        {
+            var model = new ProductModel();
+            var categories = db.Categories.Where(x => x.Deleted == false).ToList();
+            var manufacturers = db.Manufacturers.Where(x => x.Deleted == false).ToList();
 
-            }
-            foreach (var item in manufacturers)
+            model.AvailableCategories = categories.Select(x => new SelectListItem
             {
-                ManufacturerModel manufacturer = new ManufacturerModel();
-                manufacturer.Id = item.Id;
-                manufacturer.Name = item.Name;
-                model.Manufacturers.Add(manufacturer);
-            }
+                Text = x.Name,
+                Value = x.Id.ToString()
+            }).ToList();
+
+
+            model.AvailableManufacturers = manufacturers.Select(x => new SelectListItem
+            {
+                Text = x.Name,
+                Value = x.Id.ToString()
+            }).ToList();
+
+
+
+
             return View(model);
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Add(ProductModel model)
+        {
+            Product p = new Product();
+            p.Name = model.Name;
+            p.Price = model.Price;
+            p.Sku = model.Sku;
+            p.Active = model.Active;
+            p.Barcode = model.Barcode;
+            p.CategoryId = model.CategoryId;
+            p.ManufacturerId = model.ManufactureId;
+            p.CreatedOnUtc = DateTime.Now;
+            p.Description = model.Description;
+
+            db.Products.Add(p);
+            db.SaveChanges();
+            return RedirectToAction("List");
+        }
+
+
+        public ActionResult Edit(int id)
+        {
+            ProductModel model = new ProductModel();
+            var product = db.Products.SingleOrDefault(x => x.Id == id);
+            var categories = db.Categories.Where(x => x.Deleted == false).ToList();
+            var manufacturers = db.Manufacturers.Where(x => x.Deleted == false).ToList();
+
+            model.AvailableCategories = categories.Select(x => new SelectListItem
+            {
+                Text = x.Name,
+                Value = x.Id.ToString()
+            }).ToList();
+
+
+            model.AvailableManufacturers = manufacturers.Select(x => new SelectListItem
+            {
+                Text = x.Name,
+                Value = x.Id.ToString()
+            }).ToList();
+
+            
+
+            model.Id = product.Id;
+            model.ManufactureId = product.ManufacturerId;
+            model.Name = product.Name;
+            model.Price = product.Price;
+            model.Sku = product.Sku;
+            model.Active = product.Active;
+            model.Barcode = product.Barcode;
+            model.CategoryId = product.CategoryId;
+            model.Description = product.Description;
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Edit(ProductModel model)
         {
-            var entity = db.Products.Find(model.Id);
-            entity.Id = model.Id;
-            entity.Name = model.Name;
-            entity.Description = model.Description;
-            entity.Barcode = model.Barcode;
-            entity.Sku = model.Sku;
-            entity.Price = model.Price;
-            entity.CategoryId = model.CategoryId;
-            entity.ManufacturerId = model.ManufacturerId;
-            entity.Active = model.Active;
-            entity.UpdateOnUtc = DateTime.Now;
+            Product product = db.Products.SingleOrDefault(x => x.Id == model.Id);
+            product.ManufacturerId = model.ManufactureId;
+            product.Name = model.Name;
+            product.Price = model.Price;
+            product.Sku = model.Sku;
+            product.Active = model.Active;
+            product.Barcode = model.Barcode;
+            product.CategoryId = model.CategoryId;
+            product.Description = model.Description;
+
             db.SaveChanges();
+
+
             return RedirectToAction("List");
         }
 
         public ActionResult Delete(int id)
         {
-            var entity = db.Products.Find(id);
-            entity.Deleted = true;
-            db.SaveChanges();
-            return RedirectToAction("List");
-            
-        }
-
-        public ActionResult Add()
-        {
-            var categorys = db.Categories.Where(x => x.Deleted == false).Where(x => x.Published == true);
-            var manufacturers = db.Manufacturers.Where(x => x.Deleted == false).Where(x => x.Published == true);
-            ProductModel model = new ProductModel();
-            foreach (var item in categorys)
-            {
-                CategoryModel category = new CategoryModel();
-                category.Id = item.Id;
-                category.Name = item.Name;
-                model.Categorys.Add(category);
-
-            }
-            foreach (var item in manufacturers)
-            {
-                ManufacturerModel manufacturer = new ManufacturerModel();
-                manufacturer.Id = item.Id;
-                manufacturer.Name = item.Name;
-                model.Manufacturers.Add(manufacturer);
-            }
-
-            return View(model);
-        }
-
-        [HttpPost]
-        public ActionResult Add(ProductModel model)
-        {
-            
-            Product product = new Product();
-            product.Name = model.Name;
-            product.Description = model.Description;
-            product.Barcode = model.Barcode;
-            product.Sku = model.Sku;
-            product.Price = model.Price;
-            product.CategoryId = model.CategoryId;
-            product.ManufacturerId = model.ManufacturerId;
-            product.CreatedOnUtc = DateTime.Now;
-            db.Products.Add(product);
+            Product product = db.Products.SingleOrDefault(x => x.Id == id);
+            product.Deleted = true;
             db.SaveChanges();
             return RedirectToAction("List");
         }
+
 
 
     }

@@ -10,11 +10,7 @@ namespace ECommerce.Web.Areas.Admin.Models
         public ProductListModel()
         {
             Products = new List<ProductModel>();
-            Categorys = new List<CategoryModel>();
-            Manufacturers = new List<ManufacturerModel>();
         }
         public List<ProductModel> Products { get; set; }
-        public List<CategoryModel> Categorys { get; set; }
-        public List<ManufacturerModel> Manufacturers { get; set; }
     }
 }

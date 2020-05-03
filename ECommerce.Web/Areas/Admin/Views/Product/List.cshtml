@@ -6,7 +6,7 @@
 }
 
 <header class="page-header">
-    <h2>Customer List</h2>
+    <h2>Product List</h2>
 
     <div class="right-wrapper pull-right">
         <ol class="breadcrumbs">
@@ -37,13 +37,11 @@
             <thead>
                 <tr>
                     <th>Name</th>
-                    <th>Description</th>
-                    <th>Barcode</th>
                     <th>Sku</th>
                     <th>Price</th>
                     <th>Active</th>
-                    <th>Category</th>
-                    <th>Manufacturer</th>
+                    <th>Category Name</th>
+                    <th>Manufacture Name</th>
                     <th class="hidden-phone">Edit / Delete</th>
                 </tr>
             </thead>
@@ -52,13 +50,11 @@
                 {
                     <tr class="gradeX">
                         <td>@item.Name</td>
-                        <td>@item.Description</td>
-                        <td>@item.Barcode</td>
                         <td>@item.Sku</td>
                         <td>@item.Price</td>
-                        <td>@Html.CheckBoxFor(x=> item.Active)</td>
-                        <td>@Model.Categorys.Where(x=>x.Id == item.CategoryId).Select(x=>x.Name).SingleOrDefault()</td>
-                        <td>@Model.Manufacturers.Where(x=> x.Id == item.ManufacturerId).Select(x=>x.Name).SingleOrDefault()</td>
+                        <td>@item.Active</td>
+                        <td>@item.CategoryName</td>
+                        <td>@item.ManufactureName</td>
                         <td class=" hidden-phone">
                             @Html.ActionLink("Edit", "Edit", new { @id = item.Id }, new { @class = "mb-xs mt-xs mr-xs btn btn-sm btn-warning" })
                             @Html.ActionLink("Delete", "Delete", new { @id = item.Id }, new { @class = "mb-xs mt-xs mr-xs btn btn-sm btn-danger" })

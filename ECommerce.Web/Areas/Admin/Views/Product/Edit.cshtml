@@ -1,7 +1,7 @@
 ﻿@using ECommerce.Web.Areas.Admin.Models
 @model ProductModel
 @{
-    ViewBag.Title = "Edit";
+    ViewBag.Title = "Add";
     Layout = "~/Areas/Admin/Views/Shared/_HomePage.cshtml";
 }
 
@@ -29,7 +29,6 @@
         @using (Html.BeginForm("Edit", "Product", FormMethod.Post, new { enctype = "multipart/form-data" }))
         {
             @Html.AntiForgeryToken()
-        
 
             <section class="content-body">
                 <header class="panel-heading">
@@ -73,21 +72,23 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-2 control-label" for="inputFocus">Active</label>
+                            <label class="col-md-2 control-label" for="inputFocus">Category</label>
                             <div class="col-md-4">
-                                @Html.CheckBoxFor(model => model.Active, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.DropDownListFor(model => model.CategoryId, Model.AvailableCategories, new { @class = "form-control" })
+
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-md-2 control-label" for="inputFocus">Manufacturer</label>
                             <div class="col-md-4">
-                                @Html.DropDownListFor(model => model.ManufacturerId, new SelectList(Model.Manufacturers, "Id", "Name"))
+                                @Html.DropDownListFor(model => model.ManufactureId, Model.AvailableManufacturers, new { @class = "form-control" })
+
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-2 control-label" for="inputFocus">Category</label>
+                            <label class="col-md-2 control-label" for="inputFocus">Active</label>
                             <div class="col-md-4">
-                                @Html.DropDownListFor(model => model.CategoryId, new SelectList(Model.Categorys, "Id", "Name"))
+                                @Html.CheckBoxFor(model => model.Active, new { htmlAttributes = new { @class = "form-control" } })
                             </div>
                         </div>
 
@@ -97,8 +98,4 @@
         }
     </div>
 </div>
-
-
-
-
 
